@@ -59,13 +59,75 @@ func main() {
 	for _, doc := range result {
 		log.Print("Doc ID: ", doc.Id)
 		log.Print("Doc Name: ", doc.Name)
+	}
 
-		document, err := codaClient.GetDoc(doc.Id)
+	testDocId := "wPeV8NJTam"
+	document, err := codaClient.GetDoc(testDocId)
+	if err != nil {
+		log.Print("Unable to get test document.")
+		log.Fatal(err)
+	}
+	log.Print(document)
+
+	sectionsPayload := coda.ListSectionsPayload{Limit: 2, PageToken: "2"}
+	sectionsResponse, err := codaClient.ListSections(testDocId, sectionsPayload)
+	if err != nil {
+		log.Print("unable to list sections.")
+		log.Fatal(err)
+	}
+
+	sectionResponse, err := codaClient.GetSection(testDocId, sectionsResponse.Sections[0].Id)
+	if err != nil {
+		log.Print("Unable to get section.")
+		log.Fatal(err)
+	}
+	log.Print(sectionResponse)
+
+	foldersResponse, err := codaClient.ListFolders(testDocId, coda.PaginationPayload{})
+	if err != nil {
+		log.Print("Unable to list folders.")
+		log.Fatal(err)
+	}
+	log.Print(foldersResponse)
+
+	tablesResp, err := codaClient.ListTables(testDocId, coda.PaginationPayload{})
+	if err != nil {
+		log.Print("Unable to list tables.")
+		log.Fatal(err)
+	}
+
+	tableDetail, err := codaClient.GetTable(testDocId, tablesResp.Tables[0].Id)
+	log.Print(tableDetail)
+
+	viewsResponse, err := codaClient.ListViews(testDocId, coda.PaginationPayload{})
+	if err != nil {
+		log.Print("unable to list views.")
+		log.Fatal(err)
+	}
+
+	log.Print(viewsResponse)
+
+	colsResp, err := codaClient.ListColumns(testDocId, tableDetail.Table.Id, coda.PaginationPayload{})
+	log.Print(colsResp)
+	/*	document, err := codaClient.GetDoc(doc.Id)
 		if err != nil {
 			log.Print("Unable to get document")
 			log.Fatal(err)
 		}
 
+		sectionsResp, err := codaClient.ListSections(doc.Id)
+		if err != nil {
+			log.Print("Unable to fetch responses.")
+			log.Fatal(err)
+		}
+
 		log.Print("DocumentLink: ", document.Document.BrowserLink)
-	}
+		log.Print("Sections: ", sectionsResp.PaginationResponse.NextPageLink)
+	}*/
+
+	//	var createPayload = coda.CreateDocPayload{
+	//		Title: "FAKE DOC v2",
+	//	}
+	//	createResult, err := codaClient.CreateDoc(createPayload)
+	//	log.Print(createResult)
 }
