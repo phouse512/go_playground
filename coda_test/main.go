@@ -109,6 +109,9 @@ func main() {
 
 	colsResp, err := codaClient.ListColumns(testDocId, tableDetail.Table.Id, coda.PaginationPayload{})
 	log.Print(colsResp)
+	for _, col := range colsResp.Columns {
+		log.Print(fmt.Sprintf("Column Id: %s and Name: %s", col.Id, col.Name))
+	}
 	/*	document, err := codaClient.GetDoc(doc.Id)
 		if err != nil {
 			log.Print("Unable to get document")
@@ -130,4 +133,21 @@ func main() {
 	//	}
 	//	createResult, err := codaClient.CreateDoc(createPayload)
 	//	log.Print(createResult)
+	//
+	log.Print("Rows tests.")
+	rowsResp, err := codaClient.ListTableRows(testDocId, tableDetail.Table.Id, coda.ListRowsParameters{})
+	log.Print(rowsResp.Rows[0])
+
+	insertRowsParams := coda.InsertRowsParameters{
+		Rows: [
+			{
+				Cells: [
+					{
+						Column: "c-XZAGElgNkD",
+						Value: 123,
+					},
+				]
+			}
+		],
+	}
 }
