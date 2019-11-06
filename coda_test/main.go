@@ -138,16 +138,63 @@ func main() {
 	rowsResp, err := codaClient.ListTableRows(testDocId, tableDetail.Table.Id, coda.ListRowsParameters{})
 	log.Print(rowsResp.Rows[0])
 
-	insertRowsParams := coda.InsertRowsParameters{
-		Rows: [
-			{
-				Cells: [
-					{
-						Column: "c-XZAGElgNkD",
-						Value: 123,
-					},
-				]
-			}
-		],
+	// test delete
+	toDeleteRows := []string{rowsResp.Rows[0].Id}
+	log.Print("Delete rows: ")
+	log.Print(toDeleteRows)
+	deleteParams := coda.DeleteRowsParameters{RowIds: toDeleteRows}
+	log.Print(deleteParams)
+	deleteResp, err := codaClient.DeleteRows(testDocId, tableDetail.Table.Id, deleteParams)
+	if err != nil {
+		log.Print("Unable to delete....")
+		log.Fatal(err)
+
 	}
+	log.Print("Delete resp: ")
+	log.Print(deleteResp)
+
+	cell := coda.CellParam{
+		Column: "c-XZAGElgNkD",
+		Value:  1001,
+	}
+	cell2 := coda.CellParam{
+		Column: "c-XZAGElgNkD",
+		Value:  99999990000,
+	}
+	cells := []coda.CellParam{cell}
+	rows := coda.RowParam{
+		Cells: cells,
+	}
+
+	insertRowsParams := coda.InsertRowsParameters{
+		Rows: []coda.RowParam{rows},
+	}
+	log.Print(insertRowsParams)
+	insertResp, err := codaClient.InsertRows(testDocId, tableDetail.Table.Id, insertRowsParams)
+	if err != nil {
+		log.Print("Failed insert")
+		log.Print(err)
+	}
+
+	log.Print(insertResp)
+
+	log.Print("Testing out update row functionality")
+	cells2 := []coda.CellParam{cell2}
+	rows2 := coda.RowParam{
+		Cells: cells2,
+	}
+	updateParams := coda.UpdateRowParameters{Row: rows2}
+	updateResp, err := codaClient.UpdateRow(testDocId, tableDetail.Table.Id, rowsResp.Rows[1].Id, updateParams)
+	if err != nil {
+		log.Print("Unable to update row.")
+		log.Fatal(err)
+	}
+	log.Print(updateResp)
+
+	userResp, err := codaClient.GetUserInfo()
+	if err != nil {
+		log.Print("Unable to get info.")
+		log.Fatal(err)
+	}
+	log.Print(userResp)
 }
